@@ -2,10 +2,7 @@ package com.example.aopdemo.aspect;
 
 import com.example.aopdemo.Account;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -17,6 +14,22 @@ import java.util.List;
 @Order(2)
 public class MyDemoLoggingAspect {
 
+    @AfterThrowing(
+            pointcut = "execution(* com.example.aopdemo.dao.AccountDAO.findAccounts(..))",
+            throwing = "theExc")
+    public void afterThrowingAccountAdvice(
+            JoinPoint theJoinPoint, Throwable theExc) {
+        String method = theJoinPoint.getSignature().toShortString();
+
+        System.out.println("\n=====>>> Executing @AfterReturning on method: " + method);
+
+        System.out.println("\n=====>>> The exception is : " + theExc);
+
+
+
+
+    }
+
     @AfterReturning(
             pointcut = "execution(* com.example.aopdemo.dao.AccountDAO.findAccounts(..))",
             returning = "result")
@@ -26,6 +39,20 @@ public class MyDemoLoggingAspect {
         System.out.println("\n=====>>> Executing @AfterReturning on method: " + method);
 
         System.out.println("\n=====>>> result is: " + result);
+
+        convertAccountNameToUpperCase(result);
+
+        System.out.println("\n=====>>> result is: " + result);
+
+    }
+
+    private void convertAccountNameToUpperCase(List<Account> result) {
+
+        for (Account tempAccount : result) {
+            String theUpperName = tempAccount.getName().toUpperCase();
+
+            tempAccount.setName(theUpperName);
+        }
     }
 
     @Before("com.example.aopdemo.aspect.LuvAopExpressions.forDaoPackageNoGetterSetter()")
